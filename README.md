@@ -1,4 +1,4 @@
-# Primo Email
+# Primo Email ![](https://travis-ci.org/TrevorRice39/PrimoEmail.svg?branch=master)
 
 ## About
 Team project for CSC 440 Applied Software Engineering. This app will be a desktop app that allows users to send and receive emails, instant message, create chatrooms, and also train a machine learning algorithm to detect spam.
@@ -13,7 +13,8 @@ pip install pipenv
 python main.py
 ```
 ## Authors
-Trevor Rice
-Allen Roberts
+#### Trevor Rice
+#### Allen Roberts
+
 
 
