@@ -8,5 +8,3 @@ python:
 script:
   - cd tests
   - python test.py
-  - cd..
-  - python main.py
