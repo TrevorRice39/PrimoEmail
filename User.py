@@ -18,7 +18,7 @@ class User:
         self.server = smtplib.SMTP(host='smtp-mail.outlook.com', port=587)
         self.server.starttls()
         if len(self.email_address) == 0 or len(self.password) == 0:
-            return False;
+            return False
         try:
             self.server.login(self.email_address, self.password)
         except smtplib.SMTPException:

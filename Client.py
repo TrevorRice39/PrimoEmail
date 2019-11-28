@@ -1,4 +1,4 @@
-#!/usr/bin/python3           # This is client.py file
+#!/usr/bin/python3  
 
 import socket
 
@@ -12,18 +12,12 @@ def send_message(type, message_text):
     # connection to hostname on the port.
     s.connect((host, port))     
     len_of_message = str(len(message_text))
-    if type == "chat":
-        type += '*'
-    elif type != "email":
-        return
+    if type != "emails" and type != "messages":
+        type = "blank"
+    elif type == "emails":
+        type += "  "
     info = type + '|' + len_of_message.zfill(14)        
-    s.sendall(info.encode())    
+    s.sendall(info.encode('ascii'))    
     msg = message_text                           
     s.sendall(msg.encode())
-
-    # Receive no more than 1024 bytes
-    msg = s.recv(1024)         
     s.close()
-    print (msg.decode('ascii'))
-send_message("emfail", "here is my email")
-send_message("chat", "here is my message")

@@ -1,5 +1,7 @@
-#!/usr/bin/python3           # This is server.py file
-import socket                                         
+#!/usr/bin/python3          
+import socket               
+import dbHelper
+conn = dbHelper.Connection("127.0.0.1", "root", "", "PrimoEmail", False)
 
 # create a socket object
 serversocket = socket.socket(
@@ -21,10 +23,14 @@ while True:
    clientsocket,addr = serversocket.accept()      
 
    print("Got a connection from %s" % str(addr))
-   header = clientsocket.recv(20).decode('ascii')
+   header = clientsocket.recv(23).decode('ascii')
    
-   print(header)
-   header = clientsocket.recv(400)
-   msg = 'Thank you for connecting'+ "\r\n"
-   clientsocket.send(msg.encode('ascii'))
+   messageType, size = header.split('|')
+   messageType = messageType.replace(' ', '')
+   print("type=", messageType, "|")
+   
+   if messageType != "blank":
+      size = int(size)
+      message = clientsocket.recv(size)
+      conn.insert(messageType, "message", [message])
    clientsocket.close()
