@@ -391,7 +391,7 @@ class TableWidget(QWidget):
 
         
     def send_email(self, _):
-        email = Email.Email(self.user.email_address, self.send_to.text(), self.subject_new.text(), self.body_new.toPlainText(), self.user.server)
+        email = Email.Email(self.user.email_address, self.send_to.text(), self.subject_new.text(), self.body_new.toPlainText())
         email.send()
         self.send_to.setText("")
         self.subject_new.setText("")

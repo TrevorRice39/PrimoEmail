@@ -85,13 +85,13 @@ class Connection:
             if (len(where) == 0):
                 sql = "select " + select + " from " + fr
             else:
-                sql = "select " + select + " from " + fr + " where" + where
+                sql = "select " + select + " from " + fr + " where " + where
             self.cursor.execute(sql)
-            for x in self.cursor.fetchall():
-                print(x)
+            return self.cursor.fetchall()
         else:
             print('Table ' + fr + ' does not exist')
-
+            return None
+            
     def to_csv(self, tablename, into):
         """
         Dumps a table from the database into a csv file
