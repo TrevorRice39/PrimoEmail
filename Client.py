@@ -25,11 +25,11 @@ def send_message(message):
     host = socket.gethostname()                           
 
     port = 9999
-
+    pickled_message = pickle.dumps(message)
+    len_message = str(len(pickled_message))
     # connection to hostname on the port.
     s.connect((host, port))     
-    len_of_message = str(len(message))
-    info = "messages" + '|' + len_of_message.zfill(14)        
+    info = "messages" + '|' + len_message.zfill(14)        
     s.sendall(info.encode('ascii'))                         
-    s.send(message)
+    s.sendall(pickled_message)
     s.close()
