@@ -23,8 +23,8 @@ def insert_email(payload):
    print(payload)
    email = pickle.loads(payload)
    print(email.body)
-   insert_values= [(email.sender, email.to, email.body, time.strftime('%Y-%m-%d %H:%M:%S'))]
-   conn.insert("emails", "sender, receiver, body, sentDate", insert_values)
+   insert_values= [(email.sender, email.to, email.subject, email.body, time.strftime('%Y-%m-%d %H:%M:%S'))]
+   conn.insert("emails", "sender, receiver, subject, body, sentDate", insert_values)
 # insert message into db
 def insert_message(payload):
    conn.insert("messages", "message", [payload])
