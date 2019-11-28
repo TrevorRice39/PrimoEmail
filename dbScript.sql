@@ -5,7 +5,10 @@ USE PrimoEmail;
 
 CREATE TABLE emails (
 	email_id INT AUTO_INCREMENT,
-	message TEXT,
+	sender VARCHAR(100),
+	receiver VARCHAR(100),
+	body TEXT,
+	sentDate DATETIME,
 	PRIMARY KEY (email_id)
 	);
 	

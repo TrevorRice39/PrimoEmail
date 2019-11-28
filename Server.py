@@ -1,5 +1,8 @@
 #!/usr/bin/python3          
-import socket               
+import socket  
+import pickle          
+import time    
+
 import dbHelper
 conn = dbHelper.Connection("127.0.0.1", "root", "", "PrimoEmail", False)
 
@@ -17,7 +20,11 @@ def process_request(requestType, payload):
 
 # insert email into db
 def insert_email(payload):
-   conn.insert("emails", "message", [payload])
+   print(payload)
+   email = pickle.loads(payload)
+   print(email.body)
+   insert_values= [(email.sender, email.to, email.body, time.strftime('%Y-%m-%d %H:%M:%S'))]
+   conn.insert("emails", "sender, receiver, body, sentDate", insert_values)
 # insert message into db
 def insert_message(payload):
    conn.insert("messages", "message", [payload])

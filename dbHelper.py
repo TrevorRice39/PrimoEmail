@@ -45,8 +45,13 @@ class Connection:
             values: values to be inserted (list)
         """
         tables = self.cursor.execute('show tables like \'' + tablename + '\'')
+        placeholders = "%s, "*len(values[0])
+        placeholders = placeholders[0 : -2]
+        print(placeholders)
         if (self.cursor.fetchone()): # if table exists
-            sql = "insert ignore into " + tablename + " " + "(" + labels + ")" + " values " + "(%s)"
+            sql = "insert ignore into " + tablename + " " + "(" + labels + ")" + " values " + "(" + placeholders + ")"
+            print(sql)
+            print(values)
             self.cursor.executemany(sql, values)
             self.database.commit()
         else:
