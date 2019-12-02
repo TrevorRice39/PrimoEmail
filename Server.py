@@ -126,7 +126,6 @@ while True:
     # will look like:
     # "dataReq |0000000000size"
     header = clientsocket.recv(23).decode('ascii')
-    print(header)
     # unpack the request type and size of message
     requestType, size = header.split('|')
     # make sure there are no spaces (because of formatting)

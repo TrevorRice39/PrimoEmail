@@ -3,7 +3,8 @@ import os
 directoryPath = os.path.dirname(os.path.realpath(__file__))
 directoryPath = directoryPath[:directoryPath.rfind('/')]
 import sys
-import subprocess
+import time
+import threading
 
 sys.path.insert(1, directoryPath + '/Code')
 from PyQt5.QtWidgets import *
@@ -11,7 +12,7 @@ from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 import PyQt5.QtCore as QtCore
 import User as User
-import Email as Email
+import Email
 
 
 class App(QMainWindow):
@@ -374,6 +375,7 @@ class TableWidget(QWidget):
         self.setLayout(self.layout)
 
     def login(self, _):
+
         self.user = User.User(self.email_address.text(), self.password.text())
         valid = self.user.start_server()
 
@@ -391,12 +393,18 @@ class TableWidget(QWidget):
 
     def send_email(self, _):
         email = Email.Email(self.user.email_address, self.send_to.text(), self.subject_new.text(),
-                            self.body_new.toPlainText())
-        email.send()
+                            self.body_new.toPlainText(), time.strftime('%Y-%m-%d %H:%M:%S'))
+
+        send_email_thread = threading.Thread(target=email.send())
+        send_email_thread.start()
+
         self.send_to.setText("")
         self.subject_new.setText("")
         self.body_new.setText("")
         self.dialog.showMessage("Email sent!")
+
+    def update_local_emails(self):
+        pass
 
 
 if __name__ == '__main__':
