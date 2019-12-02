@@ -1,8 +1,10 @@
 import os
+
 directoryPath = os.path.dirname(os.path.realpath(__file__))
-directoryPath = directoryPath[ :directoryPath.rfind('/')]
+directoryPath = directoryPath[:directoryPath.rfind('/')]
 import sys
 import subprocess
+
 sys.path.insert(1, directoryPath + '/Code')
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
@@ -10,6 +12,8 @@ from PyQt5.QtCore import *
 import PyQt5.QtCore as QtCore
 import User as User
 import Email as Email
+
+
 class App(QMainWindow):
 
     def __init__(self):
@@ -33,12 +37,13 @@ class App(QMainWindow):
         self.setCentralWidget(self.table_widget)
         self.show()
 
+
 class TableWidget(QWidget):
 
     def __init__(self, parent):
         super(QWidget, self).__init__(parent)
         self.layout = QVBoxLayout(self)
-        
+
         self.user = None
 
         # initialize all tabs
@@ -48,7 +53,7 @@ class TableWidget(QWidget):
         self.new_email_tab = QWidget()
         self.spam_tab = QWidget()
         self.chat_tab = QWidget()
-        self.tabs.resize(300,200)
+        self.tabs.resize(300, 200)
 
         # css for entire TableWidget
         self.setStyleSheet("""
@@ -82,7 +87,6 @@ class TableWidget(QWidget):
 
         # adding the login tab at first
         self.tabs.addTab(self.login_tab, "Welcome!")
-        
 
         #### login tab
         self.login_tab.layout = QVBoxLayout()
@@ -107,7 +111,7 @@ class TableWidget(QWidget):
         self.password = QLineEdit(self.login_tab.group_box_login)
         self.password.move(140, 110)
         self.password.setFixedSize(300, 40)
-        self.password.setEchoMode(QLineEdit.Password) # hides password
+        self.password.setEchoMode(QLineEdit.Password)  # hides password
 
         # password label
         self.password_label = QLabel(self.login_tab.group_box_login)
@@ -120,7 +124,7 @@ class TableWidget(QWidget):
         self.login_button.setText("Login")
         self.login_button.setFixedSize(100, 50)
         self.login_button.move(200, 200)
-        self.login_button.clicked.connect(self.login) # call self.login() when clicked
+        self.login_button.clicked.connect(self.login)  # call self.login() when clicked
 
         ##### inbox tab
         self.inbox_tab.layout = QHBoxLayout()
@@ -144,25 +148,25 @@ class TableWidget(QWidget):
         self.email_list = QListWidget()
         self.email_list.insertItem(0, "Sender: Trevor Rice\nSubject: CSC 440\nDate: 05/07/2019")
         self.inbox_tab.setStyleSheet(
-        '''
-            QListWidget::item {
-                border: 1px solid black;
-                background: gray;
-                margin-bottom: 5px;
-            }
-
-            QLabel {
-            
-            }
-
-            QLineEdit {
+            '''
+                QListWidget::item {
+                    border: 1px solid black;
+                    background: gray;
+                    margin-bottom: 5px;
+                }
+    
+                QLabel {
                 
-            }
-
-        '''
+                }
+    
+                QLineEdit {
+                    
+                }
+    
+            '''
         )
         self.emails_layout.addWidget(self.email_list)
-        
+
         # layout to display email
         self.details_layout = QVBoxLayout()
 
@@ -172,7 +176,7 @@ class TableWidget(QWidget):
         self.sender_label.setFixedSize(60, 30)
         self.sender_label.move(6, 30)
         self.details_layout.addWidget(self.sender_label)
-        
+
         # read only line edit for sender's address
         self.sender = QLineEdit(self.inbox_tab.group_box_email_details)
         self.sender.move(70, 30)
@@ -185,7 +189,7 @@ class TableWidget(QWidget):
         self.subject_label.setText("Subject: ")
         self.subject_label.setFixedSize(60, 30)
         self.subject_label.move(10, 70)
-        
+
         # read only line edit for subject
         self.subject = QLineEdit(self.inbox_tab.group_box_email_details)
         self.subject.move(70, 70)
@@ -229,7 +233,6 @@ class TableWidget(QWidget):
         # emails_layout.addItem(verticalSpacer1)
         self.inbox_tab.group_box_emails.setLayout(self.emails_layout)
 
-
         ### chat tab
         self.chat_tab.layout = QHBoxLayout()
         self.chat_tab.setLayout(self.chat_tab.layout)
@@ -237,7 +240,7 @@ class TableWidget(QWidget):
         self.chat_tab.group_box_friends = QGroupBox("Friends List")
         self.chat_tab.group_box_chatrooms = QGroupBox("Chatrooms")
         self.chat_tab.group_box_chat = QGroupBox("Chat")
-        
+
         self.chat_tab.group_box_chatrooms.setFixedWidth(200)
         self.chat_tab.group_box_friends.setFixedWidth(200)
         self.chat_tab.layout.addWidget(self.chat_tab.group_box_friends)
@@ -250,26 +253,26 @@ class TableWidget(QWidget):
         friend_list.insertItem(1, "Allen Roberts")
         friend_list.insertItem(2, "Kuang-nan Chang")
         self.chat_tab.setStyleSheet(
-        '''
-            QListWidget::item {
-                border: 1px solid black;
-                background: gray;
-                margin-bottom: 5px;
-            }
-
-            QLabel {
-            
-            }
-
-            QLineEdit {
+            '''
+                QListWidget::item {
+                    border: 1px solid black;
+                    background: gray;
+                    margin-bottom: 5px;
+                }
+    
+                QLabel {
                 
-            }
-
-            QTextEdit::text {
-                text-align: right;
-            }
-
-        '''
+                }
+    
+                QLineEdit {
+                    
+                }
+    
+                QTextEdit::text {
+                    text-align: right;
+                }
+    
+            '''
         )
         friends_layout.addWidget(friend_list)
         self.chat_tab.group_box_friends.setLayout(friends_layout)
@@ -279,10 +282,9 @@ class TableWidget(QWidget):
         self.chatroom_list.insertItem(0, "CSC 440\n10 Users")
         self.chatroom_list.insertItem(1, "CSC 546\n3 Users")
         self.chatroom_list.insertItem(2, "CSC 309\n 7 Users")
-        
+
         self.chatroom_layout.addWidget(self.chatroom_list)
         self.chat_tab.group_box_chatrooms.setLayout(self.chatroom_layout)
-
 
         self.chat_text = QLabel(self.chat_tab.group_box_chat)
         self.chat_text.move(26, 30)
@@ -324,12 +326,11 @@ class TableWidget(QWidget):
 
         self.new_email_tab.group_box = QGroupBox("Compose Email")
         self.new_email_tab.layout.addWidget(self.new_email_tab.group_box)
-        
+
         self.sender_text_new = QLabel(self.new_email_tab.group_box)
         self.sender_text_new.setText("Send to: ")
         self.sender_text_new.setFixedSize(60, 30)
         self.sender_text_new.move(6, 30)
-        
 
         self.send_to = QLineEdit(self.new_email_tab.group_box)
         self.send_to.move(70, 30)
@@ -339,7 +340,6 @@ class TableWidget(QWidget):
         self.send_to_text.setText("Subject: ")
         self.send_to_text.setFixedSize(60, 30)
         self.send_to_text.move(10, 70)
-        
 
         self.subject_new = QLineEdit(self.new_email_tab.group_box)
         self.subject_new.move(70, 70)
@@ -381,22 +381,24 @@ class TableWidget(QWidget):
             self.dialog.showMessage('Login Sucessful!')
             self.login_tab.close()
             self.login_tab.deleteLater()
-            self.tabs.addTab(self.inbox_tab,"Inbox")
-            self.tabs.addTab(self.new_email_tab,"New Email")
-            self.tabs.addTab(self.chat_tab,"Chat")
+            self.tabs.addTab(self.inbox_tab, "Inbox")
+            self.tabs.addTab(self.new_email_tab, "New Email")
+            self.tabs.addTab(self.chat_tab, "Chat")
             self.tabs.addTab(self.spam_tab, "Spam")
 
         else:
             self.dialog.showMessage('Login Unsucessful. Please re-enter credentials.')
 
-        
     def send_email(self, _):
-        email = Email.Email(self.user.email_address, self.send_to.text(), self.subject_new.text(), self.body_new.toPlainText())
+        email = Email.Email(self.user.email_address, self.send_to.text(), self.subject_new.text(),
+                            self.body_new.toPlainText())
         email.send()
         self.send_to.setText("")
         self.subject_new.setText("")
         self.body_new.setText("")
         self.dialog.showMessage("Email sent!")
+
+
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     ex = App()

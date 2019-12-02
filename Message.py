@@ -1,4 +1,6 @@
-import Client 
+import Client
+
+
 # simple class for a instant message
 class Message:
 
@@ -10,7 +12,7 @@ class Message:
         self.chatroom_id = chatroom_id
         self.text = text
         self.sent_date_time = sent_date_time
-        
+
     # send the message
     def send(self):
         Client.send_message(self)

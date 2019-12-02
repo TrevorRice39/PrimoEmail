@@ -1,6 +1,9 @@
-import pymysql
-pymysql.install_as_MySQLdb()
 import os
+import pymysql
+
+pymysql.install_as_MySQLdb()
+
+
 class Connection:
 
     def __init__(self, host, user, passwd, database, newdatabase):
@@ -18,17 +21,18 @@ class Connection:
         self.user = user
         self.passwd = passwd
         self.databasename = database
-        if (newdatabase): # checks if you wish to create a new database
-            self.database = pymysql.connect(host=self.host,user=self.user,passwd=self.passwd)
+        if (newdatabase):  # checks if you wish to create a new database
+            self.database = pymysql.connect(host=self.host, user=self.user, passwd=self.passwd)
         else:
-            self.database = pymysql.connect(host=self.host,user=self.user,passwd=self.passwd, database=self.databasename)
+            self.database = pymysql.connect(host=self.host, user=self.user, passwd=self.passwd,
+                                            database=self.databasename)
         self.cursor = self.database.cursor()
         self.createDatabase(self.databasename)
         self.cursor.execute('use ' + self.databasename)
 
-
     def close_connection(self):
         return
+
     def createDatabase(self, databasename):
         """
         Creates the database
@@ -46,10 +50,10 @@ class Connection:
             values: values to be inserted (list)
         """
         tables = self.cursor.execute('show tables like \'' + tablename + '\'')
-        placeholders = "%s, "*len(values[0])
-        placeholders = placeholders[0 : -2]
+        placeholders = "%s, " * len(values[0])
+        placeholders = placeholders[0: -2]
         print(placeholders)
-        if (self.cursor.fetchone()): # if table exists
+        if (self.cursor.fetchone()):  # if table exists
             sql = "insert ignore into " + tablename + " " + "(" + labels + ")" + " values " + "(" + placeholders + ")"
             print(sql)
             print(values)
@@ -66,9 +70,9 @@ class Connection:
             labels: variable types and names
         """
         tables = self.cursor.execute('show tables like \'' + tablename + '\'')
-        if (self.cursor.fetchone()): # if table exists
+        if (self.cursor.fetchone()):  # if table exists
             print('Table \'' + tablename + '\'' + ' already exists')
-        else :
+        else:
             sql = "create table " + tablename + "(" + labels + ")"
             self.cursor.execute(sql)
             self.database.commit()
@@ -82,7 +86,7 @@ class Connection:
             where: where condition (str)
         """
         tables = self.cursor.execute('show tables like \'' + fr + '\'')
-        if (self.cursor.fetchone()): # if table exists
+        if (self.cursor.fetchone()):  # if table exists
             if (len(where) == 0):
                 sql = "select " + select + " from " + fr
             else:
@@ -92,7 +96,7 @@ class Connection:
         else:
             print('Table ' + fr + ' does not exist')
             return None
-            
+
     def to_csv(self, tablename, into):
         """
         Dumps a table from the database into a csv file
@@ -102,5 +106,5 @@ class Connection:
         """
         if os.path.exists(into):
             os.remove(into)
-        sql = 'select * from ' + tablename + ' into outfile \'' + into + '\' fields terminated by ' + "','" +' lines terminated by ' + "'\n'"
+        sql = 'select * from ' + tablename + ' into outfile \'' + into + '\' fields terminated by ' + "','" + ' lines terminated by ' + "'\n'"
         self.cursor.execute(sql)

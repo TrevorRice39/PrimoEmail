@@ -5,19 +5,20 @@ import pickle
 # host ip
 host = socket.gethostname()
 
-#host port                           
+# host port
 port = 9999
 
 # length of longest header
-header_max_length = 8 
+header_max_length = 8
 
 # 10^14 bytes possible for a message
-message_max_size = 14 
+message_max_size = 14
+
 
 # creates a meta data header to request/send info from/to server
 def create_header(request_type, message):
     # get the length of the message
-    len_message= str(len(message))
+    len_message = str(len(message))
 
     # make the header, should be 23 bytes exactly
     header = request_type.ljust(header_max_length) + '|' + len_message.zfill(message_max_size)
@@ -25,16 +26,18 @@ def create_header(request_type, message):
     # return header
     return header
 
+
 # create a new socket
 def new_socket(host, port):
     # initialize the socket
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM) 
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
     # connect to our host and port
-    s.connect((host, port))  
+    s.connect((host, port))
 
     # return the socket
     return s
+
 
 # send an email to be stored on the server
 def send_email(email):
@@ -51,13 +54,14 @@ def send_email(email):
     header = create_header("emails", pickled_email)
 
     # send the header to the server so it knows how much data to recieve
-    s.sendall(header.encode('ascii'))                             
+    s.sendall(header.encode('ascii'))
 
     # send the data
     s.sendall(pickled_email)
 
     # close the socket
     s.close()
+
 
 # send a message to be stored on the server
 def send_message(message):
@@ -71,7 +75,7 @@ def send_message(message):
     header = create_header("messages", pickled_message)
 
     # send the header to the server so it knows how large the message is
-    s.sendall(header.encode('ascii'))      
+    s.sendall(header.encode('ascii'))
 
     # send the message                   
     s.sendall(pickled_message)
@@ -79,12 +83,13 @@ def send_message(message):
     # close the socket
     s.close()
 
+
 # get emails from the server
 # bySender: should we request the emails based on sender or reciever
 # address: email address to query by
 def request_emails(bySender, address):
     # make a new socket
-    s = new_socket(host, port) 
+    s = new_socket(host, port)
 
     # make a list of data to send to the server
     request = [bySender, address]
@@ -93,10 +98,10 @@ def request_emails(bySender, address):
     pickled_request = pickle.dumps(request)
 
     # make a new header for the request
-    header = create_header("getEmail", pickled_request)    
+    header = create_header("getEmail", pickled_request)
 
     # send the header so the server knows how much data to recieve
-    s.sendall(header.encode('ascii'))        
+    s.sendall(header.encode('ascii'))
 
     # send the data                 
     s.sendall(pickled_request)
@@ -120,12 +125,13 @@ def request_emails(bySender, address):
     # return the emails
     return emails
 
+
 # request messages from the server
 # chatroomId: what chatroom to query from
 # index: what is the starting index of the messages
 def request_messages(chatroomId, index):
     # make a socket
-    s = new_socket(host, port) 
+    s = new_socket(host, port)
 
     # prepare the request
     request = [chatroomId, index]
@@ -134,10 +140,10 @@ def request_messages(chatroomId, index):
     pickled_request = pickle.dumps(request)
 
     # make a header
-    header = create_header("getMsgs", pickled_request)   
+    header = create_header("getMsgs", pickled_request)
 
     # send the header 
-    s.sendall(header.encode('ascii'))          
+    s.sendall(header.encode('ascii'))
 
     # send the request               
     s.sendall(pickled_request)
