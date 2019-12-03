@@ -14,7 +14,7 @@ import PyQt5.QtCore as QtCore
 import User as User
 import Email
 import dbHelper
-
+import Client
 # connect to db
 db = dbHelper.Connection("127.0.0.1", "root", "", "PrimoEmailLocal", False)
 
@@ -364,11 +364,19 @@ class TableWidget(QWidget):
 
         self.layout.addWidget(self.tabs)
         self.setLayout(self.layout)
+        
+        self.list_of_emails = []
+        
 
+    def update_inbox(self):
+        self.email_list.clear()
+        for i, email in enumerate(self.list_of_emails):
+            self.email_list.insertItem(i, "Sender: {0}\nSubject: {1}\nDate: {2}".format(email.sender, email.subject, email.time_sent))
+            
     def login(self, _):
 
-        #self.user = User.User(self.email_address.text(), self.password.text())
-        #valid = self.user.start_server()
+        self.user = User.User(self.email_address.text(), self.password.text())
+        valid = self.user.start_server()
 
         if (True):
             self.dialog.showMessage('Login Sucessful!')
@@ -381,7 +389,7 @@ class TableWidget(QWidget):
 
         else:
             self.dialog.showMessage('Login Unsucessful. Please re-enter credentials.')
-
+        self.update_local_emails()
     def send_email(self, _):
         email = Email.Email(self.user.email_address, self.send_to.text(), self.subject_new.text(),
                             self.body_new.toPlainText(), time.strftime('%Y-%m-%d %H:%M:%S'))
@@ -395,6 +403,8 @@ class TableWidget(QWidget):
         self.dialog.showMessage("Email sent!")
 
     def update_local_emails(self):
+        self.list_of_emails = Client.request_emails(False, self.user.email_address)
+        self.update_inbox()
         pass
 
 
