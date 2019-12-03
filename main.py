@@ -405,6 +405,7 @@ class TableWidget(QWidget):
     def update_local_emails(self):
         self.list_of_emails = Client.request_emails(False, self.user.email_address)
         self.update_inbox()
+        threading.Timer(10, self.update_local_emails).start()
         pass
 
 
