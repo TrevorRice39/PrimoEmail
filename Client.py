@@ -1,6 +1,7 @@
 #!/usr/bin/python3  
 import socket
 import pickle
+import dbHelper
 
 # host ip
 host = socket.gethostname()
@@ -13,6 +14,9 @@ header_max_length = 8
 
 # 10^14 bytes possible for a message
 message_max_size = 14
+
+# connect to db
+db = dbHelper.Connection("127.0.0.1", "root", "", "PrimoEmailLocal", False)
 
 
 # creates a meta data header to request/send info from/to server
@@ -118,7 +122,13 @@ def request_emails(bySender, address):
 
     # unpickle the emails from the recieved data
     emails = pickle.loads(received_data)
+    
+    # prepare the values to be inserted
+    insert_values = [(email.id, email.sender, email.to, email.subject, email.body, email.time_sent) for email in emails]
 
+    # calling db.insert() to insert data
+    db.insert("emails", "email_id, sender, receiver, subject, body, sent_date", insert_values)
+    
     # close the socket
     s.close()
 

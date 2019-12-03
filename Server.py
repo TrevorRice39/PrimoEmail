@@ -72,7 +72,10 @@ def send_emails_to_client(payload, clientsocket):
     else:  # if we are searching by the reciever
         data = db.select("*", "emails", "receiver = '{0}'".format(address))
         for entry in data:
-            emails.append(Email.Email(entry[1], entry[2], entry[3], entry[4], entry[5]))
+            email = Email.Email(entry[1], entry[2], entry[3], entry[4], entry[5])
+            email.set_id(entry[0])
+            emails.append(email)
+            
     # pickle the emails into bytes
     pickled_emails = pickle.dumps(emails)
     # send them back to the client

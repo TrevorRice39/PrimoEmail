@@ -13,7 +13,10 @@ from PyQt5.QtCore import *
 import PyQt5.QtCore as QtCore
 import User as User
 import Email
+import dbHelper
 
+# connect to db
+db = dbHelper.Connection("127.0.0.1", "root", "", "PrimoEmailLocal", False)
 
 class App(QMainWindow):
 
@@ -291,23 +294,11 @@ class TableWidget(QWidget):
         self.chat_text.move(26, 30)
         self.chat_text.setText("Trevor Rice")
 
-        self.you_text = QLabel(self.chat_tab.group_box_chat)
-        self.you_text.move(380, 30)
-        self.you_text.setText("You")
-
         self.chat_view_left = QTextEdit(self.chat_tab.group_box_chat)
         self.chat_view_left.move(26, 50)
-        self.chat_view_left.setFixedSize(350, 400)
+        self.chat_view_left.setFixedSize(700, 400)
         self.chat_view_left.setText("Messages")
         self.chat_view_left.setReadOnly(True)
-
-        self.chat_view_right = QTextEdit(self.chat_tab.group_box_chat)
-        self.chat_view_right.move(380, 50)
-        self.chat_view_right.setFixedSize(350, 400)
-        self.chat_view_right.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        self.chat_view_right.setAlignment(Qt.AlignRight)
-        self.chat_view_right.setText("Messages")
-        self.chat_view_right.setReadOnly(True)
 
         self.send_message_text = QTextEdit(self.chat_tab.group_box_chat)
         self.send_message_text.move(26, 480)
@@ -376,10 +367,10 @@ class TableWidget(QWidget):
 
     def login(self, _):
 
-        self.user = User.User(self.email_address.text(), self.password.text())
-        valid = self.user.start_server()
+        #self.user = User.User(self.email_address.text(), self.password.text())
+        #valid = self.user.start_server()
 
-        if (valid):
+        if (True):
             self.dialog.showMessage('Login Sucessful!')
             self.login_tab.close()
             self.login_tab.deleteLater()
