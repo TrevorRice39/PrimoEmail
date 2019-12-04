@@ -17,6 +17,11 @@ CREATE TABLE messages (
 	message_id INT AUTO_INCREMENT,
 	chatroom_id INT,
 	message TEXT,
-	sent_date DATETIME,
+	sent_date DprimoemailmessagesATETIME,
 	PRIMARY KEY (message_id)
+);
+
+CREATE TABLE emaiL_chatroom (
+	chatroom_id INT,
+	address VARCHAR(100),
 );

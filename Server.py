@@ -98,7 +98,10 @@ def send_messages_to_client(payload, clientsocket):
     data = db.select("*", "messages", "chatroom_id = '{0}' limit 10 offset {1}".format(chatroom_id, offset))
     # append all the message objects
     for entry in data:
-        messages.append(Message.Message(entry[1], entry[2], entry[3]))
+        message = Message.Message(entry[1], entry[2], entry[3])
+        message.set_id(entry[0])
+        messages.append(message)
+
     # pickle the messages
     pickled_messages = pickle.dumps(messages)
     # send the messags back to the client

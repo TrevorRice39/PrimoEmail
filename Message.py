@@ -12,7 +12,10 @@ class Message:
         self.chatroom_id = chatroom_id
         self.text = text
         self.sent_date_time = sent_date_time
-
+        self.id = -1
     # send the message
     def send(self):
         Client.send_message(self)
+
+    def set_id(self, id):
+        self.id = id

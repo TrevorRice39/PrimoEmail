@@ -14,7 +14,7 @@ CREATE TABLE emails (
 	);
 	
 CREATE TABLE messages (
-	message_id INT AUTO_INCREMENT,
+	message_id INT UNIQUE,
 	chatroom_id INT,
 	message TEXT,
 	sent_date DATETIME,
