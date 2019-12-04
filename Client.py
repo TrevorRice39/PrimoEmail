@@ -218,14 +218,12 @@ def request_chatrooms(address):
 
     # ids in chatroom
     ids = chatrooms.get_all_ids()
-    print(ids)
     for id in ids:
         chatroom = chatrooms.get_chatroom(id)
         list_of_users = chatroom.list_of_users
         name = chatroom.name
 
         insert_values = [(id, user.email_address) for user in list_of_users]
-        print(insert_values)
         db.insert("email_chatroom", "chatroom_id, address", insert_values)
 
         insert_values = [(id, name)]

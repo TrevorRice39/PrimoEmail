@@ -6,7 +6,7 @@ USE PrimoEmailLocal;
 CREATE TABLE emails (
 	email_id INT UNIQUE,
 	sender VARCHAR(100),
-	receiver VARCHAR(100),
+	receiver VARCprimoemailHAR(100),
 	subject TEXT,
 	body TEXT,
 	sent_date DATETIME,
@@ -19,4 +19,16 @@ CREATE TABLE messages (
 	message TEXT,
 	sent_date DATETIME,
 	PRIMARY KEY (message_id)
+);
+
+primoemaillocalCREATE TABLE emaiL_chatroom (
+	chatroom_id INT,
+	address VARCHAR(100)
+	PRIMARY KEY(chatroom_id, address)
+);
+
+CREATE TABLE chatroom (
+	chatroom_id INT UNIQUE,
+	chatroom_name VARCHAR(50),
+	PRIMARY KEY (chatroom_id)
 );
