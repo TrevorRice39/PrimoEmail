@@ -150,7 +150,7 @@ class TableWidget(QWidget):
 
         # list item
         self.email_list = QListWidget()
-        self.email_list.insertItem(0, "Sender: Trevor Rice\nSubject: CSC 440\nDate: 05/07/2019")
+        self.email_list.itemClicked.connect(self.email_list_clicked)
         self.inbox_tab.setStyleSheet(
             '''
                 QListWidget::item {
@@ -337,22 +337,13 @@ class TableWidget(QWidget):
         self.subject_new.move(70, 70)
         self.subject_new.setFixedSize(1060, 30)
 
-        self.date_text_new = QLabel(self.new_email_tab.group_box)
-        self.date_text_new.setText("Date: ")
-        self.date_text_new.setFixedSize(60, 30)
-        self.date_text_new.move(27, 110)
-
-        self.date_new = QLineEdit(self.new_email_tab.group_box)
-        self.date_new.move(70, 110)
-        self.date_new.setFixedSize(1060, 30)
-
         self.body_text_new = QLabel(self.new_email_tab.group_box)
         self.body_text_new.setText("Body")
         self.body_text_new.setFixedSize(60, 30)
-        self.body_text_new.move(10, 145)
+        self.body_text_new.move(10, 120)
 
         self.body_new = QTextEdit(self.new_email_tab.group_box)
-        self.body_new.move(30, 180)
+        self.body_new.move(30, 160)
         self.body_new.setFixedSize(1100, 400)
 
         self.send = QPushButton(self.new_email_tab.group_box)
@@ -377,7 +368,7 @@ class TableWidget(QWidget):
         self.user = User.User(self.email_address.text(), self.password.text())
         valid = self.user.start_server()
 
-        if (True):
+        if (valid):
             self.dialog.showMessage('Login Sucessful!')
             self.login_tab.close()
             self.login_tab.deleteLater()
@@ -391,7 +382,7 @@ class TableWidget(QWidget):
         self.update_local_emails()
     def send_email(self, _):
         email = Email.Email(self.user.email_address, self.send_to.text(), self.subject_new.text(),
-                            self.body_new.toPlainText(), time.strftime('%Y-%m-%d %H:%M:%S'))
+                            self.body_new.toPlainText()[0 : 5000], time.strftime('%Y-%m-%d %H:%M:%S'))
 
         send_email_thread = threading.Thread(target=email.send())
         send_email_thread.start()
@@ -406,6 +397,14 @@ class TableWidget(QWidget):
         self.update_inbox()
         threading.Timer(10, self.update_local_emails).start()
         pass
+
+    def email_list_clicked(self, item):
+        email = self.list_of_emails[self.email_list.currentRow()]
+        self.sender.setText(email.sender)
+        self.body.setText(email.body)
+        self.date.setText(email.time_sent.strftime('%Y-%m-%d %H:%M:%S'))
+        self.subject.setText(email.subject)
+
 
 
 if __name__ == '__main__':
