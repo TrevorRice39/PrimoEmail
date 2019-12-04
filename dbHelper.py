@@ -31,6 +31,7 @@ class Connection:
         self.cursor.execute('use ' + self.databasename)
 
     def close_connection(self):
+        self.cursor.close()
         return
 
     def createDatabase(self, databasename):

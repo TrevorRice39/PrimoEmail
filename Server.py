@@ -7,8 +7,6 @@ import Message  # custom Message class
 import dbHelper  # class to help with db statements
 import ChatroomList
 import User
-# connect to db
-db = dbHelper.Connection("127.0.0.1", "root", "", "PrimoEmail", False)
 
 # processes the request based on what the request type is
 def process_request(requestType, payload, clientsocket):
@@ -55,15 +53,24 @@ def get_users_in_chatroom(chatroom_id):
     # list of user's emails
     users = []
 
+    # connect to db
+    db = dbHelper.Connection("127.0.0.1", "root", "", "PrimoEmail", False)
+
     # select all emails where sender = address
     data = db.select("*", "email_chatroom", "chatroom_id = '{0}'".format(chatroom_id))
     # append them to the list
     for entry in data:
         users.append(entry[1])
+    db.close_connection()
     return users
 
 def get_chatroom_name(id):
+    # connect to db
+    db = dbHelper.Connection("127.0.0.1", "root", "", "PrimoEmail", False)
+
     name = db.select("*", "chatroom", "chatroom_id = '{0}'".format(id))
+
+    db.close_connection()
     return name[0][1]
 
 def send_chatrooms_to_client(payload, clientsocket):
@@ -73,12 +80,15 @@ def send_chatrooms_to_client(payload, clientsocket):
     # list of chatroom ids
     chatroom_ids = []
 
+    # connect to db
+    db = dbHelper.Connection("127.0.0.1", "root", "", "PrimoEmail", False)
+
     # select all emails where sender = address
     data = db.select("*", "email_chatroom", "address = '{0}'".format(address))
     # append them to the list
     for entry in data:
         chatroom_ids.append(entry[0])
-
+    db.close_connection()
     # our chat room list
     chatrooms = ChatroomList.ChatroomList()
     for id in chatroom_ids:
@@ -100,10 +110,12 @@ def insert_email(payload):
 
     # prepare the values to be inserted
     insert_values = [(email.sender, email.to, email.subject, email.body, email.time_sent)]
+    # connect to db
+    db = dbHelper.Connection("127.0.0.1", "root", "", "PrimoEmail", False)
 
     # calling db.insert() to insert data
     db.insert("emails", "sender, receiver, subject, body, sent_date", insert_values)
-
+    db.close_connection()
 
 # insert message into db
 def insert_message(payload):
@@ -113,8 +125,12 @@ def insert_message(payload):
     # prepare the value to be inserted
     insert_values = [(message.sender_address, message.chatroom_id, message.text, time.strftime('%Y-%m-%d %H:%M:%S'))]
 
+    # connect to db
+    db = dbHelper.Connection("127.0.0.1", "root", "", "PrimoEmail", False)
+
     # calling db.insert() to insert data
     db.insert("messages", "sender_address, chatroom_id, message, sent_date", insert_values)
+    db.close_connection()
 
 
 # return emails back to client
@@ -128,6 +144,8 @@ def send_emails_to_client(payload, clientsocket):
 
     # list of emails
     emails = []
+    # connect to db
+    db = dbHelper.Connection("127.0.0.1", "root", "", "PrimoEmail", False)
 
     # if we are searching by sender
     if queryBySender:
@@ -142,6 +160,8 @@ def send_emails_to_client(payload, clientsocket):
             email = Email.Email(entry[1], entry[2], entry[3], entry[4], entry[5])
             email.set_id(entry[0])
             emails.append(email)
+
+    db.close_connection()
 
     # pickle the emails into bytes
     pickled_emails = pickle.dumps(emails)
@@ -161,6 +181,9 @@ def send_messages_to_client(payload, clientsocket):
     # list of messages
     messages = []
 
+    # connect to db
+    db = dbHelper.Connection("127.0.0.1", "root", "", "PrimoEmail", False)
+
     # prepare our select statement, where chatroom id = our chatroom id, and offset it by our offset
     data = db.select("*", "messages", "chatroom_id = '{0}'".format(chatroom_id, offset))
     # append all the message objects
@@ -168,7 +191,7 @@ def send_messages_to_client(payload, clientsocket):
         message = Message.Message(entry[0], entry[2], entry[3], entry[4])
         message.set_id(entry[1])
         messages.append(message)
-
+    db.close_connection()
     # pickle the messages
     pickled_messages = pickle.dumps(messages)
     # send the messags back to the client

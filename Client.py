@@ -15,8 +15,7 @@ header_max_length = 8
 # 10^14 bytes possible for a message
 message_max_size = 14
 
-# connect to db
-db = dbHelper.Connection("127.0.0.1", "root", "", "PrimoEmailLocal", False)
+
 
 
 # creates a meta data header to request/send info from/to server
@@ -126,10 +125,13 @@ def request_emails(bySender, address):
     # prepare the values to be inserted
     insert_values = [(email.id, email.sender, email.to, email.subject, email.body, email.time_sent) for email in emails]
 
+    # connect to db
+    db = dbHelper.Connection("127.0.0.1", "root", "", "PrimoEmailLocal", False)
+
     # calling db.insert() to insert data
     if len(insert_values) > 0:
         db.insert("emails", "email_id, sender, receiver, subject, body, sent_date", insert_values)
-
+    db.close_connection()
     # close the socket
     s.close()
 
@@ -175,10 +177,14 @@ def request_messages(chatroomId, index):
         (message.sender_address, message.id, message.chatroom_id, message.text, message.sent_date_time) for
         message in messages]
 
+    # connect to db
+    db = dbHelper.Connection("127.0.0.1", "root", "", "PrimoEmailLocal", False)
+
     # calling db.insert() to insert data
     if len(insert_values) > 0:
         db.insert("messages", "sender_address, message_id, chatroom_id, message, sent_date", insert_values)
 
+    db.close_connection()
     # close the socket
     s.close()
 
@@ -239,6 +245,8 @@ def request_chatrooms(address):
 
     # ids in chatroom
     ids = chatrooms.get_all_ids()
+    # connect to db
+    db = dbHelper.Connection("127.0.0.1", "root", "", "PrimoEmailLocal", False)
     for id in ids:
         chatroom = chatrooms.get_chatroom(id)
         list_of_users = chatroom.list_of_users
@@ -250,7 +258,7 @@ def request_chatrooms(address):
         insert_values = [(id, name)]
 
         db.insert("chatroom", "chatroom_id, chatroom_name", insert_values)
-
+    db.close_connection()
     s.close()
 
     # return the messages
@@ -280,41 +288,41 @@ def get_next_id():
     return id + 1
 
 
-def request_users_in_chatroom(chatroom_id):
-    # make a socket
-    s = new_socket(host, port)
-
-    # prepare the request
-    request = chatroom_id
-
-    # pickle the request into bytes
-    pickled_request = pickle.dumps(request)
-
-    # make a header
-    header = create_header("getUsers", pickled_request)
-
-    # send the header
-    s.sendall(header.encode('ascii'))
-
-    # send the request
-    s.sendall(pickled_request)
-
-    # recieve data sent from server
-    received_data = b""
-    data = s.recv(50000)
-    while len(data) != 0:
-        # append the recieved data to recieved_data
-        received_data += data
-        data = s.recv(50000)
-    # unpickle the users
-    users = pickle.loads(received_data)
-
-    # calling db.insert() to insert data
-    if len(users) > 0:
-        db.insert("email_chatroom", "chatroom_id, address", users)
-
-    # close the socket
-    s.close()
-
-    # return the messages
-    return users
+# def request_users_in_chatroom(chatroom_id):
+#     # make a socket
+#     s = new_socket(host, port)
+#
+#     # prepare the request
+#     request = chatroom_id
+#
+#     # pickle the request into bytes
+#     pickled_request = pickle.dumps(request)
+#
+#     # make a header
+#     header = create_header("getUsers", pickled_request)
+#
+#     # send the header
+#     s.sendall(header.encode('ascii'))
+#
+#     # send the request
+#     s.sendall(pickled_request)
+#
+#     # recieve data sent from server
+#     received_data = b""
+#     data = s.recv(50000)
+#     while len(data) != 0:
+#         # append the recieved data to recieved_data
+#         received_data += data
+#         data = s.recv(50000)
+#     # unpickle the users
+#     users = pickle.loads(received_data)
+#
+#     # calling db.insert() to insert data
+#     if len(users) > 0:
+#         db.insert("email_chatroom", "chatroom_id, address", users)
+#
+#     # close the socket
+#     s.close()
+#
+#     # return the messages
+#     return users

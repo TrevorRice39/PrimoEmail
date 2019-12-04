@@ -238,9 +238,9 @@ class TableWidget(QWidget):
         self.body.setReadOnly(True)
 
         # mark as spam button
-        self.mark_spam = QPushButton(self.inbox_tab.group_box_email_details)
-        self.mark_spam.setText("Mark as spam")
-        self.mark_spam.move(30, 585)
+        # self.mark_spam = QPushButton(self.inbox_tab.group_box_email_details)
+        # self.mark_spam.setText("Mark as spam")
+        # self.mark_spam.move(30, 585)
 
         # self.inbox_tab.group_box_email_details.setLayout(details_layout)
         # verticalSpacer1 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
@@ -388,7 +388,7 @@ class TableWidget(QWidget):
             self.tabs.addTab(self.inbox_tab, "Inbox")
             self.tabs.addTab(self.new_email_tab, "New Email")
             self.tabs.addTab(self.chat_tab, "Chat")
-            self.tabs.addTab(self.spam_tab, "Spam")
+            # self.tabs.addTab(self.spam_tab, "Spam")
 
         else:
             self.dialog.showMessage('Login Unsucessful. Please re-enter credentials.')
