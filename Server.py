@@ -24,7 +24,47 @@ def process_request(requestType, payload, clientsocket):
     # if a client wants to get messages
     elif requestType == "getMsgs":
         send_messages_to_client(payload, clientsocket)
+    elif requestType == "getCR":
+        send_chatrooms_to_client(payload, clientsocket)
+    elif requestType == "getUsers":
+        send_users_to_client(payload, clientsocket)
 
+def send_users_to_client(payload, clientsocket):
+    # load the chatroom id from the payload
+    chatroom_id = pickle.loads(payload)
+    print(chatroom_id)
+    # list of user's emails
+    users = []
+
+    # select all emails where sender = address
+    data = db.select("*", "email_chatroom", "chatroom_id = '{0}'".format(chatroom_id))
+    print(data)
+    # append them to the list
+    for entry in data:
+        users.append(entry)
+    print(users)
+    # pickle the list of users into bytes
+    pickled_users = pickle.dumps(users)
+    # send them back to the client
+    clientsocket.send(pickled_users)
+
+def send_chatrooms_to_client(payload, clientsocket):
+    # load the address from the payload
+    address = pickle.loads(payload)
+
+    # list of chatroom ids
+    chatroom_ids = []
+
+    # select all emails where sender = address
+    data = db.select("*", "email_chatroom", "address = '{0}'".format(address))
+    # append them to the list
+    for entry in data:
+        chatroom_ids.append(entry)
+
+    # pickle the list of ids into bytes
+    pickled_ids = pickle.dumps(chatroom_ids)
+    # send them back to the client
+    clientsocket.send(pickled_ids)
 
 # insert email into db
 def insert_email(payload):

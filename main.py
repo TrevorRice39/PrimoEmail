@@ -15,6 +15,8 @@ import User as User
 import Email
 import dbHelper
 import Client
+import ChatroomList
+
 # connect to db
 db = dbHelper.Connection("127.0.0.1", "root", "", "PrimoEmailLocal", False)
 
@@ -49,6 +51,7 @@ class TableWidget(QWidget):
         self.layout = QVBoxLayout(self)
 
         self.user = None
+        self.chatrooms = ChatroomList()
 
         # initialize all tabs
         self.tabs = QTabWidget()
@@ -396,7 +399,6 @@ class TableWidget(QWidget):
         self.list_of_emails = Client.request_emails(False, self.user.email_address)
         self.update_inbox()
         threading.Timer(10, self.update_local_emails).start()
-        pass
 
     def email_list_clicked(self, item):
         email = self.list_of_emails[self.email_list.currentRow()]
@@ -405,6 +407,10 @@ class TableWidget(QWidget):
         self.date.setText(email.time_sent.strftime('%Y-%m-%d %H:%M:%S'))
         self.subject.setText(email.subject)
 
+    def update_chatroom_list(self):
+        chatroom_list = Client.get_chatrooms(self.user.email_address)
+        self.update_inbox()
+        threading.Timer(10, self.update_local_emails).start()
 
 
 if __name__ == '__main__':

@@ -23,5 +23,5 @@ CREATE TABLE messages (
 
 CREATE TABLE emaiL_chatroom (
 	chatroom_id INT,
-	address VARCHAR(100),
+	address VARCHAR(100)
 );

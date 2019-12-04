@@ -122,14 +122,14 @@ def request_emails(bySender, address):
 
     # unpickle the emails from the recieved data
     emails = pickle.loads(received_data)
-    
+
     # prepare the values to be inserted
     insert_values = [(email.id, email.sender, email.to, email.subject, email.body, email.time_sent) for email in emails]
 
     # calling db.insert() to insert data
     if len(insert_values) > 0:
         db.insert("emails", "email_id, sender, receiver, subject, body, sent_date", insert_values)
-    
+
     # close the socket
     s.close()
 
@@ -171,15 +171,100 @@ def request_messages(chatroomId, index):
     messages = pickle.loads(received_data)
 
     # prepare the value to be inserted
-    insert_values = [(message.id, message.chatroom_id, message.text, message.sent_date_time.strftime('%Y-%m-%d %H:%M:%S')) for message in messages]
+    insert_values = [
+        (message.id, message.chatroom_id, message.text, message.sent_date_time.strftime('%Y-%m-%d %H:%M:%S')) for
+        message in messages]
 
     # calling db.insert() to insert data
     if len(insert_values) > 0:
         db.insert("messages", "message_id, chatroom_id, message, sent_date", insert_values)
-
 
     # close the socket
     s.close()
 
     # return the messages
     return messages
+
+
+def request_chatrooms_by_user(address):
+    # make a socket
+    s = new_socket(host, port)
+
+    # prepare the request
+    request = address
+
+    # pickle the request into bytes
+    pickled_request = pickle.dumps(request)
+
+    # make a header
+    header = create_header("getCR", pickled_request)
+
+    # send the header
+    s.sendall(header.encode('ascii'))
+
+    # send the request
+    s.sendall(pickled_request)
+
+    # recieve data sent from server
+    received_data = b""
+    data = s.recv(5000)
+    while len(data) != 0:
+        # append the recieved data to recieved_data
+        received_data += data
+        data = s.recv(5000)
+
+    # unpickle the ids
+    ids = pickle.loads(received_data)
+
+    # prepare the value to be inserted
+    insert_values = [(id[0], id[1]) for id in ids]
+
+    # calling db.insert() to insert data
+    if len(insert_values) > 0:
+        db.insert("email_chatroom", "chatroom_id, address", insert_values)
+
+    # close the socket
+    s.close()
+
+    # return the messages
+    return ids
+
+def request_users_in_chatroom(chatroom_id):
+    # make a socket
+    s = new_socket(host, port)
+
+    # prepare the request
+    request = chatroom_id
+
+    # pickle the request into bytes
+    pickled_request = pickle.dumps(request)
+
+    # make a header
+    header = create_header("getUsers", pickled_request)
+
+    # send the header
+    s.sendall(header.encode('ascii'))
+
+    # send the request
+    s.sendall(pickled_request)
+
+    # recieve data sent from server
+    received_data = b""
+    data = s.recv(5000)
+    while len(data) != 0:
+        # append the recieved data to recieved_data
+        received_data += data
+        data = s.recv(5000)
+
+    # unpickle the users
+    users = pickle.loads(received_data)
+
+    # calling db.insert() to insert data
+    if len(users) > 0:
+        db.insert("email_chatroom", "chatroom_id, address", users)
+
+    # close the socket
+    s.close()
+
+    # return the messages
+    return users
