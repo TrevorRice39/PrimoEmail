@@ -5,7 +5,8 @@ import time  # date and time library
 import Email  # custom email class
 import Message  # custom Message class
 import dbHelper  # class to help with db statements
-
+import ChatroomList
+import User
 # connect to db
 db = dbHelper.Connection("127.0.0.1", "root", "", "PrimoEmail", False)
 
@@ -26,27 +27,25 @@ def process_request(requestType, payload, clientsocket):
         send_messages_to_client(payload, clientsocket)
     elif requestType == "getCR":
         send_chatrooms_to_client(payload, clientsocket)
-    elif requestType == "getUsers":
-        send_users_to_client(payload, clientsocket)
+    # elif requestType == "getUsers":
+    #     send_users_to_client(payload, clientsocket)
 
-def send_users_to_client(payload, clientsocket):
-    # load the chatroom id from the payload
-    chatroom_id = pickle.loads(payload)
-    print(chatroom_id)
+
+def get_users_in_chatroom(chatroom_id):
+
     # list of user's emails
     users = []
 
     # select all emails where sender = address
     data = db.select("*", "email_chatroom", "chatroom_id = '{0}'".format(chatroom_id))
-    print(data)
     # append them to the list
     for entry in data:
-        users.append(entry)
-    print(users)
-    # pickle the list of users into bytes
-    pickled_users = pickle.dumps(users)
-    # send them back to the client
-    clientsocket.send(pickled_users)
+        users.append(entry[1])
+    return users
+
+def get_chatroom_name(id):
+    name = db.select("*", "chatroom", "chatroom_id = '{0}'".format(id))
+    return name[0][1]
 
 def send_chatrooms_to_client(payload, clientsocket):
     # load the address from the payload
@@ -59,12 +58,23 @@ def send_chatrooms_to_client(payload, clientsocket):
     data = db.select("*", "email_chatroom", "address = '{0}'".format(address))
     # append them to the list
     for entry in data:
-        chatroom_ids.append(entry)
+        chatroom_ids.append(entry[0])
 
-    # pickle the list of ids into bytes
-    pickled_ids = pickle.dumps(chatroom_ids)
+    # our chat room list
+    chatrooms = ChatroomList.ChatroomList()
+    for id in chatroom_ids:
+
+        list_of_users = get_users_in_chatroom(id)
+
+        list_of_users = [User.User(user, "") for user in list_of_users]
+
+        chatrooms.add_chatroom(id, list_of_users, get_chatroom_name(id))
+
+    # pickle the list of users into bytes
+    pickled_chatrooms = pickle.dumps(chatrooms)
     # send them back to the client
-    clientsocket.send(pickled_ids)
+    clientsocket.send(pickled_chatrooms)
+
 
 # insert email into db
 def insert_email(payload):
@@ -115,7 +125,7 @@ def send_emails_to_client(payload, clientsocket):
             email = Email.Email(entry[1], entry[2], entry[3], entry[4], entry[5])
             email.set_id(entry[0])
             emails.append(email)
-            
+
     # pickle the emails into bytes
     pickled_emails = pickle.dumps(emails)
     # send them back to the client

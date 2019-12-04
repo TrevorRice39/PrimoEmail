@@ -1,7 +1,7 @@
-#!/usr/bin/python3  
 import socket
 import pickle
 import dbHelper
+import ChatroomList
 
 # host ip
 host = socket.gethostname()
@@ -186,7 +186,7 @@ def request_messages(chatroomId, index):
     return messages
 
 
-def request_chatrooms_by_user(address):
+def request_chatrooms(address):
     # make a socket
     s = new_socket(host, port)
 
@@ -213,21 +213,30 @@ def request_chatrooms_by_user(address):
         received_data += data
         data = s.recv(5000)
 
-    # unpickle the ids
-    ids = pickle.loads(received_data)
+    # unpickle the chatrooms
+    chatrooms = pickle.loads(received_data)
 
-    # prepare the value to be inserted
-    insert_values = [(id[0], id[1]) for id in ids]
+    # ids in chatroom
+    ids = chatrooms.get_all_ids()
+    print(ids)
+    for id in ids:
+        chatroom = chatrooms.get_chatroom(id)
+        list_of_users = chatroom.list_of_users
+        name = chatroom.name
 
-    # calling db.insert() to insert data
-    if len(insert_values) > 0:
+        insert_values = [(id, user.email_address) for user in list_of_users]
+        print(insert_values)
         db.insert("email_chatroom", "chatroom_id, address", insert_values)
 
-    # close the socket
+        insert_values = [(id, name)]
+
+        db.insert("chatroom", "chatroom_id, chatroom_name", insert_values)
+
     s.close()
 
     # return the messages
-    return ids
+    return chatrooms
+
 
 def request_users_in_chatroom(chatroom_id):
     # make a socket

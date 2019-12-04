@@ -25,3 +25,9 @@ CREATE TABLE emaiL_chatroom (
 	chatroom_id INT,
 	address VARCHAR(100)
 );
+
+CREATE TABLE chatroom (
+	chatroom_id INT UNIQUE,
+	chatroom_name VARCHAR(50),
+	PRIMARY KEY (chatroom_id)
+);
