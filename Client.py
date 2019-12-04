@@ -185,6 +185,27 @@ def request_messages(chatroomId, index):
     # return the messages
     return messages
 
+def create_chatroom(name, address):
+    id = get_next_id()
+    # make a socket
+    s = new_socket(host, port)
+
+    # prepare the request
+    request = (id, name, address)
+
+    # pickle the request into bytes
+    pickled_request = pickle.dumps(request)
+
+    # make a header
+    header = create_header("makeCR", pickled_request)
+
+    # send the header
+    s.sendall(header.encode('ascii'))
+
+    # send the request
+    s.sendall(pickled_request)
+
+    s.close()
 
 def request_chatrooms(address):
     # make a socket
@@ -235,6 +256,29 @@ def request_chatrooms(address):
     # return the messages
     return chatrooms
 
+def get_next_id():
+    # make a socket
+    s = new_socket(host, port)
+
+    # make a header
+    header = create_header("getID", "")
+
+    # send the header
+    s.sendall(header.encode('ascii'))
+
+    # recieve data sent from server
+    received_data = b""
+    data = s.recv(5000)
+    while len(data) != 0:
+        # append the recieved data to recieved_data
+        received_data += data
+        data = s.recv(5000)
+    # unpickle the users
+    id = pickle.loads(received_data)
+    # close the socket
+    s.close()
+    return id + 1
+
 
 def request_users_in_chatroom(chatroom_id):
     # make a socket
@@ -257,12 +301,11 @@ def request_users_in_chatroom(chatroom_id):
 
     # recieve data sent from server
     received_data = b""
-    data = s.recv(5000)
+    data = s.recv(50000)
     while len(data) != 0:
         # append the recieved data to recieved_data
         received_data += data
-        data = s.recv(5000)
-
+        data = s.recv(50000)
     # unpickle the users
     users = pickle.loads(received_data)
 

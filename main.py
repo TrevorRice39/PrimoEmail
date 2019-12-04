@@ -5,7 +5,6 @@ directoryPath = directoryPath[:directoryPath.rfind('/')]
 import sys
 import time
 import threading
-
 sys.path.insert(1, directoryPath + '/Code')
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
@@ -51,7 +50,7 @@ class TableWidget(QWidget):
         self.layout = QVBoxLayout(self)
 
         self.user = None
-        self.chatrooms = ChatroomList()
+        self.chatrooms = ChatroomList.ChatroomList()
 
         # initialize all tabs
         self.tabs = QTabWidget()
@@ -286,16 +285,21 @@ class TableWidget(QWidget):
 
         self.chatroom_layout = QVBoxLayout()
         self.chatroom_list = QListWidget()
-        self.chatroom_list.insertItem(0, "CSC 440\n10 Users")
-        self.chatroom_list.insertItem(1, "CSC 546\n3 Users")
-        self.chatroom_list.insertItem(2, "CSC 309\n 7 Users")
+
+        self.new_chatroom = QPushButton()
+        self.new_chatroom.setText("New Chatroom")
+        self.new_chatroom.clicked.connect(self.make_new_chatroom)
+        #self.send.setText("Send Email")
+        #self.send.move(30, 585)
+        # self.send.clicked.connect(self.send_email)
+        self.chatroom_layout.addWidget(self.new_chatroom)
 
         self.chatroom_layout.addWidget(self.chatroom_list)
         self.chat_tab.group_box_chatrooms.setLayout(self.chatroom_layout)
 
         self.chat_text = QLabel(self.chat_tab.group_box_chat)
         self.chat_text.move(26, 30)
-        self.chat_text.setText("Trevor Rice")
+        # self.chat_text.setText("Trevor Rice")
 
         self.chat_view_left = QTextEdit(self.chat_tab.group_box_chat)
         self.chat_view_left.move(26, 50)
@@ -383,6 +387,7 @@ class TableWidget(QWidget):
         else:
             self.dialog.showMessage('Login Unsucessful. Please re-enter credentials.')
         self.update_local_emails()
+        self.update_chatroom_list()
     def send_email(self, _):
         email = Email.Email(self.user.email_address, self.send_to.text(), self.subject_new.text(),
                             self.body_new.toPlainText()[0 : 5000], time.strftime('%Y-%m-%d %H:%M:%S'))
@@ -408,10 +413,25 @@ class TableWidget(QWidget):
         self.subject.setText(email.subject)
 
     def update_chatroom_list(self):
-        chatroom_list = Client.get_chatrooms(self.user.email_address)
-        self.update_inbox()
-        threading.Timer(10, self.update_local_emails).start()
+        import Client
+        chatroom_list = Client.request_chatrooms(self.user.email_address)
+        list_of_ids = chatroom_list.get_all_ids()
+        for id in list_of_ids:
+            chatroom = chatroom_list.get_chatroom(id)
+            self.chatrooms.add_chatroom(chatroom.chatroom_id, chatroom.list_of_users, chatroom.name)
 
+        self.chatroom_list.clear()
+        list_of_ids = self.chatrooms.get_all_ids()
+        for i, id in enumerate(list_of_ids):
+            self.chatroom_list.insertItem(i, "Name: {0}\nID: {1}".format(chatroom_list.get_name(id), id))
+
+        # self.update_inbox()
+        threading.Timer(1, self.update_chatroom_list).start()
+
+    def make_new_chatroom(self):
+        name, ok = QInputDialog.getText(self, 'Enter a name for chatroom', 'Chatroom Name:')
+        if ok:
+            Client.create_chatroom(name, self.user.email_address)
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

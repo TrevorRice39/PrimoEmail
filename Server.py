@@ -10,7 +10,6 @@ import User
 # connect to db
 db = dbHelper.Connection("127.0.0.1", "root", "", "PrimoEmail", False)
 
-
 # processes the request based on what the request type is
 def process_request(requestType, payload, clientsocket):
     # if the client sends an email payload
@@ -27,12 +26,32 @@ def process_request(requestType, payload, clientsocket):
         send_messages_to_client(payload, clientsocket)
     elif requestType == "getCR":
         send_chatrooms_to_client(payload, clientsocket)
-    # elif requestType == "getUsers":
-    #     send_users_to_client(payload, clientsocket)
+    elif requestType == "makeCR":
+        make_chatroom(payload, clientsocket)
+    elif requestType == "getID":
+        send_client_max_id(clientsocket)
 
+def send_client_max_id(clientsocket):
+    id = db.select("max(chatroom_id)", "chatroom", "")
+    pickled_id = pickle.dumps(id[0][0])
+    clientsocket.sendall(pickled_id)
+def make_chatroom(payload, clientsocket):
+    # pickle the email into bytes
+    id, name, user_address = pickle.loads(payload)
+
+    # prepare the values to be inserted
+    insert_values = [(id, name)]
+
+    # calling db.insert() to insert data
+    db.insert("chatroom", "chatroom_id, chatroom_name", insert_values)
+
+    # prepare the values to be inserted
+    insert_values = [(id, user_address)]
+
+    # calling db.insert() to insert data
+    db.insert("email_chatroom", "chatroom_id, address", insert_values)
 
 def get_users_in_chatroom(chatroom_id):
-
     # list of user's emails
     users = []
 
@@ -63,17 +82,15 @@ def send_chatrooms_to_client(payload, clientsocket):
     # our chat room list
     chatrooms = ChatroomList.ChatroomList()
     for id in chatroom_ids:
-
         list_of_users = get_users_in_chatroom(id)
 
         list_of_users = [User.User(user, "") for user in list_of_users]
 
         chatrooms.add_chatroom(id, list_of_users, get_chatroom_name(id))
-
     # pickle the list of users into bytes
     pickled_chatrooms = pickle.dumps(chatrooms)
     # send them back to the client
-    clientsocket.send(pickled_chatrooms)
+    clientsocket.sendall(pickled_chatrooms)
 
 
 # insert email into db

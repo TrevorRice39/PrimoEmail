@@ -20,6 +20,8 @@ class ChatroomList:
     def get_list_of_users(self, chatroom_id):
         return self.chatrooms[chatroom_id].list_of_users
 
+    def get_name(self, id):
+        return self.chatrooms[id].name
     def get_chatroom(self, id):
         return self.chatrooms[id]
 
