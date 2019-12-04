@@ -14,6 +14,7 @@ CREATE TABLE emails (
 	);
 	
 CREATE TABLE messages (
+	sender_address VARCHAR(100),
 	message_id INT UNIQUE,
 	chatroom_id INT,
 	message TEXT,
@@ -21,9 +22,9 @@ CREATE TABLE messages (
 	PRIMARY KEY (message_id)
 );
 
-primoemaillocalCREATE TABLE emaiL_chatroom (
+CREATE TABLE emaiL_chatroom (
 	chatroom_id INT,
-	address VARCHAR(100)
+	address VARCHAR(100),
 	PRIMARY KEY(chatroom_id, address)
 );
 

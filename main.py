@@ -15,6 +15,8 @@ import Email
 import dbHelper
 import Client
 import ChatroomList
+import Message
+import sched
 
 # connect to db
 db = dbHelper.Connection("127.0.0.1", "root", "", "PrimoEmailLocal", False)
@@ -51,6 +53,12 @@ class TableWidget(QWidget):
 
         self.user = None
         self.chatrooms = ChatroomList.ChatroomList()
+        self.current_chatroom_id = -1
+        self.chatroom_index_to_id_map = dict()
+        self.current_chatroom_index = -1
+        self.current_messages = None
+        self.scheduler = sched.scheduler(time.time, time.sleep)
+        self.threads = []
 
         # initialize all tabs
         self.tabs = QTabWidget()
@@ -243,7 +251,7 @@ class TableWidget(QWidget):
         self.chat_tab.layout = QHBoxLayout()
         self.chat_tab.setLayout(self.chat_tab.layout)
 
-        self.chat_tab.group_box_friends = QGroupBox("Friends List")
+        self.chat_tab.group_box_friends = QGroupBox("User List")
         self.chat_tab.group_box_chatrooms = QGroupBox("Chatrooms")
         self.chat_tab.group_box_chat = QGroupBox("Chat")
 
@@ -254,10 +262,7 @@ class TableWidget(QWidget):
         self.chat_tab.layout.addWidget(self.chat_tab.group_box_chat)
 
         friends_layout = QVBoxLayout()
-        friend_list = QListWidget()
-        friend_list.insertItem(0, "Trevor Rice")
-        friend_list.insertItem(1, "Allen Roberts")
-        friend_list.insertItem(2, "Kuang-nan Chang")
+        self.friend_list = QListWidget()
         self.chat_tab.setStyleSheet(
             '''
                 QListWidget::item {
@@ -280,12 +285,12 @@ class TableWidget(QWidget):
     
             '''
         )
-        friends_layout.addWidget(friend_list)
+        friends_layout.addWidget(self.friend_list)
         self.chat_tab.group_box_friends.setLayout(friends_layout)
 
         self.chatroom_layout = QVBoxLayout()
         self.chatroom_list = QListWidget()
-
+        self.chatroom_list.itemClicked.connect(self.chatroom_selected)
         self.new_chatroom = QPushButton()
         self.new_chatroom.setText("New Chatroom")
         self.new_chatroom.clicked.connect(self.make_new_chatroom)
@@ -318,6 +323,7 @@ class TableWidget(QWidget):
         self.send_message_button = QPushButton(self.chat_tab.group_box_chat)
         self.send_message_button.setText("Send Message")
         self.send_message_button.move(620, 585)
+        self.send_message_button.clicked.connect(self.insert_message)
 
         ### new email tab
         self.new_email_tab.layout = QVBoxLayout()
@@ -388,6 +394,22 @@ class TableWidget(QWidget):
             self.dialog.showMessage('Login Unsucessful. Please re-enter credentials.')
         self.update_local_emails()
         self.update_chatroom_list()
+        self.update_messages()
+
+
+
+    def update_message_text(self):
+        self.chat_view_left.setText("")
+        for message in self.current_messages:
+            self.chat_view_left.append(str(message))
+
+    def update_messages(self):
+        updater = UpdateMessages()
+        updater.finished_updating.connect(self.update_message_text)
+        self.threads.append(updater)
+        updater.start()
+        threading.Timer(1, self.update_messages).start()
+
     def send_email(self, _):
         email = Email.Email(self.user.email_address, self.send_to.text(), self.subject_new.text(),
                             self.body_new.toPlainText()[0 : 5000], time.strftime('%Y-%m-%d %H:%M:%S'))
@@ -413,7 +435,8 @@ class TableWidget(QWidget):
         self.subject.setText(email.subject)
 
     def update_chatroom_list(self):
-        import Client
+        self.chatroom_list.setCurrentRow(self.current_chatroom_index)
+        # import Client
         chatroom_list = Client.request_chatrooms(self.user.email_address)
         list_of_ids = chatroom_list.get_all_ids()
         for id in list_of_ids:
@@ -423,15 +446,50 @@ class TableWidget(QWidget):
         self.chatroom_list.clear()
         list_of_ids = self.chatrooms.get_all_ids()
         for i, id in enumerate(list_of_ids):
+            self.chatroom_index_to_id_map[i] = id
             self.chatroom_list.insertItem(i, "Name: {0}\nID: {1}".format(chatroom_list.get_name(id), id))
+        self.chatroom_list.setCurrentRow(self.current_chatroom_index)
 
-        # self.update_inbox()
-        threading.Timer(1, self.update_chatroom_list).start()
+        # threading.Timer(3, self.update_chatroom_list).start()
 
     def make_new_chatroom(self):
         name, ok = QInputDialog.getText(self, 'Enter a name for chatroom', 'Chatroom Name:')
         if ok:
             Client.create_chatroom(name, self.user.email_address)
+        self.update_chatroom_list()
+
+    def chatroom_selected(self, item):
+        self.current_chatroom_id = self.chatroom_index_to_id_map[self.chatroom_list.currentRow()]
+        self.current_chatroom_index = self.chatroom_list.currentRow()
+        self.update_messages()
+
+        if self.current_chatroom_id != -1:
+            users = Client.request_chatrooms(self.user.email_address).get_list_of_users(self.current_chatroom_id)
+            self.friend_list.clear()
+            for i, user in enumerate(users):
+                self.friend_list.insertItem(i, user.email_address)
+
+    def insert_message(self):
+        #  def __init__(self, email_address, chatroom_id, text, sent_date_time):
+        email = self.user.email_address
+        id = self.current_chatroom_id
+        text = self.send_message_text.toPlainText()
+        time_sent = time.strftime('%Y-%m-%d %H:%M:%S')
+        message = Message.Message(email, id, text, time_sent)
+        message.send()
+        self.send_message_text.setText("")
+
+class UpdateMessages(QThread):
+
+    finished_updating = pyqtSignal()
+
+    def __init__(self):
+        QThread.__init__(self)
+
+    def run(self):
+        ex.table_widget.current_messages = Client.request_messages(ex.table_widget.current_chatroom_id, 0)
+        self.finished_updating.emit()
+
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

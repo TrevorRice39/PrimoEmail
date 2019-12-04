@@ -14,6 +14,7 @@ CREATE TABLE emails (
 	);
 	
 CREATE TABLE messages (
+	sender_address VARCHAR(100),
 	message_id INT AUTO_INCREMENT,
 	chatroom_id INT,
 	message TEXT,
@@ -33,4 +34,4 @@ CREATE TABLE chatroom (
 );
 
 INSERT INTO chatroom(chatroom_id, chatroom_name) VALUES ('4076', 'mychatroom')
-INSERT INTO email_chatroom(chatroom_id, address) VALUES (('4076', 'trevor_rice39@mymail.eku.edu'))
+INSERT INTO email_chatroom(chatroom_id, address) VALUES ('4076', 'trevor_rice39@mymail.eku.edu')

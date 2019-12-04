@@ -172,12 +172,12 @@ def request_messages(chatroomId, index):
 
     # prepare the value to be inserted
     insert_values = [
-        (message.id, message.chatroom_id, message.text, message.sent_date_time.strftime('%Y-%m-%d %H:%M:%S')) for
+        (message.sender_address, message.id, message.chatroom_id, message.text, message.sent_date_time) for
         message in messages]
 
     # calling db.insert() to insert data
     if len(insert_values) > 0:
-        db.insert("messages", "message_id, chatroom_id, message, sent_date", insert_values)
+        db.insert("messages", "sender_address, message_id, chatroom_id, message, sent_date", insert_values)
 
     # close the socket
     s.close()

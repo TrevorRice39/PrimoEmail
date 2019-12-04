@@ -111,10 +111,10 @@ def insert_message(payload):
     message = pickle.loads(payload)
 
     # prepare the value to be inserted
-    insert_values = [(message.chatroom_id, message.text, time.strftime('%Y-%m-%d %H:%M:%S'))]
+    insert_values = [(message.sender_address, message.chatroom_id, message.text, time.strftime('%Y-%m-%d %H:%M:%S'))]
 
     # calling db.insert() to insert data
-    db.insert("messages", "chatroom_id, message, sent_date", insert_values)
+    db.insert("messages", "sender_address, chatroom_id, message, sent_date", insert_values)
 
 
 # return emails back to client
@@ -162,11 +162,11 @@ def send_messages_to_client(payload, clientsocket):
     messages = []
 
     # prepare our select statement, where chatroom id = our chatroom id, and offset it by our offset
-    data = db.select("*", "messages", "chatroom_id = '{0}' limit 10 offset {1}".format(chatroom_id, offset))
+    data = db.select("*", "messages", "chatroom_id = '{0}'".format(chatroom_id, offset))
     # append all the message objects
     for entry in data:
-        message = Message.Message(entry[1], entry[2], entry[3])
-        message.set_id(entry[0])
+        message = Message.Message(entry[0], entry[2], entry[3], entry[4])
+        message.set_id(entry[1])
         messages.append(message)
 
     # pickle the messages
