@@ -374,7 +374,6 @@ class TableWidget(QWidget):
             self.email_list.insertItem(i, "Sender: {0}\nSubject: {1}\nDate: {2}".format(email.sender, email.subject, email.time_sent))
             
     def login(self, _):
-
         self.user = User.User(self.email_address.text(), self.password.text())
         valid = self.user.start_server()
 

@@ -70,7 +70,7 @@ def send_emails_to_client(payload, clientsocket):
         for entry in data:
             emails.append(Email.Email(entry[1], entry[2], entry[3], entry[4], entry[5]))
     else:  # if we are searching by the reciever
-        data = db.select("*", "emails", "receiver = '{0}'".format(address))
+        data = db.select("*", "emails", "receiver = '{0}' order by sent_date desc".format(address))
         for entry in data:
             email = Email.Email(entry[1], entry[2], entry[3], entry[4], entry[5])
             email.set_id(entry[0])

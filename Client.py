@@ -127,7 +127,8 @@ def request_emails(bySender, address):
     insert_values = [(email.id, email.sender, email.to, email.subject, email.body, email.time_sent) for email in emails]
 
     # calling db.insert() to insert data
-    db.insert("emails", "email_id, sender, receiver, subject, body, sent_date", insert_values)
+    if len(insert_values) > 0:
+        db.insert("emails", "email_id, sender, receiver, subject, body, sent_date", insert_values)
     
     # close the socket
     s.close()
