@@ -291,9 +291,14 @@ class TableWidget(QWidget):
         self.chatroom_layout = QVBoxLayout()
         self.chatroom_list = QListWidget()
         self.chatroom_list.itemClicked.connect(self.chatroom_selected)
+
         self.new_chatroom = QPushButton()
         self.new_chatroom.setText("New Chatroom")
         self.new_chatroom.clicked.connect(self.make_new_chatroom)
+
+        self.join_chatroom = QPushButton()
+        self.join_chatroom.setText("Join Chatroom")
+        self.join_chatroom.clicked.connect(self.join_new_chatroom)
         #self.send.setText("Send Email")
         #self.send.move(30, 585)
         # self.send.clicked.connect(self.send_email)
@@ -301,7 +306,7 @@ class TableWidget(QWidget):
 
         self.chatroom_layout.addWidget(self.chatroom_list)
         self.chat_tab.group_box_chatrooms.setLayout(self.chatroom_layout)
-
+        self.chatroom_layout.addWidget(self.join_chatroom)
         self.chat_text = QLabel(self.chat_tab.group_box_chat)
         self.chat_text.move(26, 30)
         # self.chat_text.setText("Trevor Rice")
@@ -451,6 +456,11 @@ class TableWidget(QWidget):
         self.chatroom_list.setCurrentRow(self.current_chatroom_index)
 
         # threading.Timer(3, self.update_chatroom_list).start()
+    def join_new_chatroom(self):
+        id, ok = QInputDialog.getText(self, 'Enter chatroom ID', 'Chatroom ID:')
+        if ok:
+            Client.add_user_to_chatroom(self.user.email_address, id)
+        self.update_chatroom_list()
 
     def make_new_chatroom(self):
         name, ok = QInputDialog.getText(self, 'Enter a name for chatroom', 'Chatroom Name:')
