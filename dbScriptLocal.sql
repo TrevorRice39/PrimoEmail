@@ -6,7 +6,7 @@ USE PrimoEmailLocal;
 CREATE TABLE emails (
 	email_id INT UNIQUE,
 	sender VARCHAR(100),
-	receiver VARCprimoemailHAR(100),
+	receiver VARCHAR(100),
 	subject TEXT,
 	body TEXT,
 	sent_date DATETIME,

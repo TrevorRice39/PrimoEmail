@@ -195,7 +195,6 @@ class TableWidget(QWidget):
         self.sender = QLineEdit(self.inbox_tab.group_box_email_details)
         self.sender.move(70, 30)
         self.sender.setFixedSize(700, 30)
-        self.sender.setText("Trevor Rice")
         self.sender.setReadOnly(True)
 
         # label for subject
@@ -208,7 +207,6 @@ class TableWidget(QWidget):
         self.subject = QLineEdit(self.inbox_tab.group_box_email_details)
         self.subject.move(70, 70)
         self.subject.setFixedSize(700, 30)
-        self.subject.setText("CSC 440")
         self.subject.setReadOnly(True)
 
         # label for date
@@ -221,7 +219,6 @@ class TableWidget(QWidget):
         self.date = QLineEdit(self.inbox_tab.group_box_email_details)
         self.date.move(70, 110)
         self.date.setFixedSize(700, 30)
-        self.date.setText("05/07/2019")
         self.date.setReadOnly(True)
 
         # label for body
@@ -234,7 +231,6 @@ class TableWidget(QWidget):
         self.body = QTextEdit(self.inbox_tab.group_box_email_details)
         self.body.move(30, 180)
         self.body.setFixedSize(700, 400)
-        self.body.setText("Hello Dr. Chang,\n    Here is my Project Report.\nTrevor Rice")
         self.body.setReadOnly(True)
 
         # mark as spam button
