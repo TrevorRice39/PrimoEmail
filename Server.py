@@ -28,17 +28,42 @@ def process_request(requestType, payload, clientsocket):
         make_chatroom(payload, clientsocket)
     elif requestType == "getID":
         send_client_max_id(clientsocket)
+    elif requestType == "addUCR":
+        add_user_to_chatroom(payload)
+
+def add_user_to_chatroom(payload):
+    address, chatroom_id = pickle.loads(payload)
+
+    # connect to db
+    db = dbHelper.Connection("127.0.0.1", "root", "", "PrimoEmail", False)
+    count = db.select("count(*)", "chatroom", "chatroom_id = {0}".format(chatroom_id))[0][0]
+
+    if count != 0:
+        insert_values = [(chatroom_id, address)]
+
+        # calling db.insert() to insert data
+        db.insert("email_chatroom", "chatroom_id, address", insert_values)
+    db.close_connection()
+
 
 def send_client_max_id(clientsocket):
+    # connect to db
+    db = dbHelper.Connection("127.0.0.1", "root", "", "PrimoEmail", False)
+
     id = db.select("max(chatroom_id)", "chatroom", "")
     pickled_id = pickle.dumps(id[0][0])
     clientsocket.sendall(pickled_id)
+
+    db.close_connection()
 def make_chatroom(payload, clientsocket):
     # pickle the email into bytes
     id, name, user_address = pickle.loads(payload)
 
     # prepare the values to be inserted
     insert_values = [(id, name)]
+
+    # connect to db
+    db = dbHelper.Connection("127.0.0.1", "root", "", "PrimoEmail", False)
 
     # calling db.insert() to insert data
     db.insert("chatroom", "chatroom_id, chatroom_name", insert_values)
@@ -48,6 +73,8 @@ def make_chatroom(payload, clientsocket):
 
     # calling db.insert() to insert data
     db.insert("email_chatroom", "chatroom_id, address", insert_values)
+    db.close_connection()
+
 
 def get_users_in_chatroom(chatroom_id):
     # list of user's emails

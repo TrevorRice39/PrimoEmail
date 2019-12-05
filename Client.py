@@ -191,6 +191,22 @@ def request_messages(chatroomId, index):
     # return the messages
     return messages
 
+def add_user_to_chatroom(address, chatroom_id):
+    s = new_socket(host, port)
+
+    request = (address, chatroom_id)
+
+    pickled_request = pickle.dumps(request)
+
+    header = create_header("addUCR", pickled_request)
+
+    s.sendall(header.encode('ascii'))
+
+    s.sendall(pickled_request)
+
+    s.close()
+
+
 def create_chatroom(name, address):
     id = get_next_id()
     # make a socket
