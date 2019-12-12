@@ -32,6 +32,3 @@ CREATE TABLE chatroom (
 	chatroom_name VARCHAR(50),
 	PRIMARY KEY (chatroom_id)
 );
-
-INSERT INTO chatroom(chatroom_id, chatroom_name) VALUES ('4076', 'mychatroom')
-INSERT INTO email_chatroom(chatroom_id, address) VALUES ('4076', 'trevor_rice39@mymail.eku.edu')
