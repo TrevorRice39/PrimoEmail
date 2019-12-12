@@ -4,7 +4,7 @@ import dbHelper
 import ChatroomList
 
 # host ip
-host = socket.gethostname()
+host = "157.89.105.116"
 
 # host port
 port = 9999

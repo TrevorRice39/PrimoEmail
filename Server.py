@@ -36,7 +36,7 @@ def add_user_to_chatroom(payload):
 
     # connect to db
     db = dbHelper.Connection("127.0.0.1", "root", "", "PrimoEmail", False)
-    count = db.select("count(*)", "chatroom", "chatroom_id = {0}".format(chatroom_id))[0][0]
+    count = db.select("count(*)", "chatroom", "chatroom_id = '{0}'".format(chatroom_id))[0][0]
 
     if count != 0:
         insert_values = [(chatroom_id, address)]
